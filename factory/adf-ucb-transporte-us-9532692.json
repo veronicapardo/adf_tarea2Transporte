@@ -1,0 +1,10 @@
+{
+	"name": "adf-ucb-transporte-us-9532692",
+	"properties": {
+		"trustModeClaimForMi": {
+			"value": "Disabled",
+			"editable": true
+		}
+	},
+	"location": "centralus"
+}

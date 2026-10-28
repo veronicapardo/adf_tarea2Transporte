@@ -33,6 +33,9 @@
 				},
 				{
 					"name": "derivedColumn3"
+				},
+				{
+					"name": "derivedColumn4"
 				}
 			],
 			"scriptLines": [
@@ -59,9 +62,12 @@
 				"derivedColumn1 derive(HoraProgramada = toTimestamp(right(HoraProgramada, 8), 'HH:mm:ss'),",
 				"          HoraSalida = toTimestamp(right(HoraSalida, 8), 'HH:mm:ss'),",
 				"          HoraLlegada = toTimestamp(right(HoraLlegada, 8), 'HH:mm:ss')) ~> derivedColumn2",
-				"derivedColumn2 derive(RutaHistoricaId = trim(RutaHistoricaId),",
+				"derivedColumn4 derive(RutaHistoricaId = trim(RutaHistoricaId),",
 				"          VehiculoId = trim(VehiculoId),",
 				"          EstadoViaje = trim(EstadoViaje)) ~> derivedColumn3",
+				"derivedColumn2 derive(HoraProgramada = iif(isNull(HoraProgramada) || length(trim(toString(HoraProgramada))) == 0, '00:00:00', trim(toString(HoraProgramada))),",
+				"          HoraSalida = iif(isNull(HoraSalida) || length(trim(toString(HoraSalida))) == 0, '00:00:00', trim(toString(HoraSalida))),",
+				"          HoraLlegada = iif(isNull(HoraLlegada) || length(trim(toString(HoraLlegada))) == 0, '00:00:00', trim(toString(HoraLlegada)))) ~> derivedColumn4",
 				"derivedColumn3 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -92,7 +98,7 @@
 				"          HoraProgramada,",
 				"          HoraSalida,",
 				"          HoraLlegada,",
-				"          ValidacionesTarjeta,",
+				"          ValidacionesTarjeta = HoraLlegada,",
 				"          KmRecorridos,",
 				"          EstadoViaje",
 				"     )) ~> sink1"

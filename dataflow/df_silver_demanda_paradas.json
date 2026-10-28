@@ -51,7 +51,7 @@
 				"     format: 'table') ~> source1",
 				"source1 derive(FechaServicio = coalesce(toDate(FechaServicio, 'dd/MM/yyyy'), toDate(FechaServicio, 'yyyy-MM-dd'))) ~> derivedColumn1",
 				"derivedColumn1 derive(RutaHistoricaId = iif(startsWith(RutaHistoricaId, 'RH-'), RutaHistoricaId, concat('RH-', lpad(regexReplace(RutaHistoricaId, '[^0-9]', ''), 2, '0'))),",
-				"          DemandaId = iif(isNull(DemandaId), concat('DM-', toString(AnioFuente), '-', toString(FechaServicio, 'yyyyMMdd'), '-', RutaHistoricaId, '-', ParadaHistoricaId, '-', regexReplace(Franja, '[^0-9]', '')), DemandaId),",
+				"          DemandaId = iif(isNull(DemandaId), concat('DM-', '-', toString(FechaServicio, 'yyyyMMdd'), '-', RutaHistoricaId, '-', ParadaHistoricaId, '-', regexReplace(Franja, '[^0-9]', '')), DemandaId),",
 				"          ValidacionesTarjeta = toInteger(ValidacionesTarjeta),",
 				"          Descensos = toInteger(Descensos),",
 				"          DemandaNoAtendida = toInteger(DemandaNoAtendida)) ~> derivedColumn3",

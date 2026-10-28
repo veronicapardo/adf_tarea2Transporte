@@ -30,6 +30,9 @@
 				},
 				{
 					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
 				}
 			],
 			"scriptLines": [
@@ -56,7 +59,9 @@
 				"          Severidad = trim(Severidad),",
 				"          VehiculoId = iif(isNull(VehiculoId), toString(null()), trim(VehiculoId)),",
 				"          Descripcion = trim(Descripcion)) ~> derivedColumn1",
-				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"derivedColumn1 derive(IncidenteId = iif(isNull(IncidenteId) || length(trim(toString(IncidenteId))) == 0, concat('IN-GEN-', toString(year(FechaHoraInicio)), toString(month(FechaHoraInicio)), toString(dayOfMonth(FechaHoraInicio))), trim(toString(IncidenteId))),",
+				"          VehiculoId = iif(isNull(VehiculoId) || trim(VehiculoId) == 'NULL' || length(trim(VehiculoId)) == 0, toString(null()), trim(VehiculoId))) ~> derivedColumn2",
+				"derivedColumn2 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          IncidenteId as string,",

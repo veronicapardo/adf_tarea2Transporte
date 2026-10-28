@@ -1,0 +1,50 @@
+{
+	"name": "df_silver_vehiculos",
+	"properties": {
+		"folder": {
+			"name": "silver"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "dw_bronze_vehiculos_sql",
+						"type": "DatasetReference"
+					},
+					"name": "vehiculos"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "VIGENCIAS"
+				},
+				{
+					"name": "derivedColumn1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          AnioFuente as string,",
+				"          VehiculoId as string,",
+				"          Placa as string,",
+				"          TipoVehiculo as string,",
+				"          CapacidadEfectiva as string,",
+				"          VigenciaDesde as string,",
+				"          VigenciaHasta as string,",
+				"          Estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> vehiculos",
+				"vehiculos derive(VigenciaDesde = iif(isInteger(VigenciaDesde), addDays(toDate('1899-12-30'), toInteger(VigenciaDesde)), coalesce(toDate(VigenciaDesde, 'dd/MM/yyyy'), toDate(VigenciaDesde, 'yyyy-MM-dd'))),",
+				"          VigenciaHasta = iif(isInteger(VigenciaHasta), addDays(toDate('1899-12-30'), toInteger(VigenciaHasta)), coalesce(toDate(VigenciaHasta, 'dd/MM/yyyy'), toDate(VigenciaHasta, 'yyyy-MM-dd')))) ~> VIGENCIAS",
+				"VIGENCIAS derive(VehiculoId = iif(startsWith(VehiculoId, 'V-'), VehiculoId, concat('V-', lpad(regexReplace(VehiculoId, '[^0-9]', ''), 3, '0'))),",
+				"          AnioFuente = iif(isNull(AnioFuente), toShort(year(VigenciaDesde)), toShort(AnioFuente)),",
+				"          Placa = trim(Placa)) ~> derivedColumn1"
+			]
+		}
+	}
+}

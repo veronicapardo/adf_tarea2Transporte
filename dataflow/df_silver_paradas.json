@@ -1,0 +1,102 @@
+{
+	"name": "df_silver_paradas",
+	"properties": {
+		"folder": {
+			"name": "silver"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "dw_bronze_paradas_sql",
+						"type": "DatasetReference"
+					},
+					"name": "paradas"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "dw_silver_paradas_sql",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "derivedColumn3"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          AnioFuente as string,",
+				"          ParadaHistoricaId as string,",
+				"          CodigoPublicado as string,",
+				"          NombreParada as string,",
+				"          Zona as string,",
+				"          Latitud as string,",
+				"          Longitud as string,",
+				"          VigenciaDesde as string,",
+				"          VigenciaHasta as string,",
+				"          Estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> paradas",
+				"paradas derive(VigenciaDesde = iif(isInteger(VigenciaDesde), addDays(toDate('1899-12-30'), toInteger(VigenciaDesde)), coalesce(toDate(VigenciaDesde, 'yyyy-MM-dd'), toDate(VigenciaDesde, 'dd/MM/yyyy'))),",
+				"          VigenciaHasta = iif(isInteger(VigenciaHasta), addDays(toDate('1899-12-30'), toInteger(VigenciaHasta)), coalesce(toDate(VigenciaHasta, 'yyyy-MM-dd'), toDate(VigenciaHasta, 'dd/MM/yyyy')))) ~> derivedColumn1",
+				"derivedColumn1 derive(ParadaHistoricaId = trim(ParadaHistoricaId),",
+				"          CodigoPublicado = iif(isNull(CodigoPublicado), trim(ParadaHistoricaId), trim(CodigoPublicado)),",
+				"          NombreParada = trim(NombreParada),",
+				"          Zona = trim(Zona),",
+				"          Estado = trim(Estado),",
+				"          AnioFuente = iif(isNull(AnioFuente), year(FechaServicio), toInteger(AnioFuente))) ~> derivedColumn2",
+				"derivedColumn2 derive(Latitud = toDecimal(Latitud, 9, 6),",
+				"          Longitud = toDecimal(Longitud, 9, 6)) ~> derivedColumn3",
+				"derivedColumn3 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          AnioFuente as integer,",
+				"          ParadaHistoricaId as string,",
+				"          CodigoPublicado as string,",
+				"          NombreParada as string,",
+				"          Zona as string,",
+				"          Latitud as decimal(9,6),",
+				"          Longitud as decimal(9,6),",
+				"          VigenciaDesde as date,",
+				"          VigenciaHasta as date,",
+				"          Estado as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          AnioFuente,",
+				"          ParadaHistoricaId,",
+				"          CodigoPublicado,",
+				"          NombreParada,",
+				"          Zona,",
+				"          Latitud,",
+				"          Longitud,",
+				"          VigenciaDesde,",
+				"          VigenciaHasta,",
+				"          Estado",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}

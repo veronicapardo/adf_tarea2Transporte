@@ -50,8 +50,8 @@
 			{
 				"name": "KmRecorridos",
 				"type": "decimal",
-				"precision": 8,
-				"scale": 1
+				"precision": 10,
+				"scale": 2
 			},
 			{
 				"name": "EstadoViaje",

@@ -25,18 +25,15 @@
 			},
 			{
 				"name": "FechaHoraInicio",
-				"type": "datetime2",
-				"scale": 0
+				"type": "nvarchar"
 			},
 			{
 				"name": "FechaHoraFin",
-				"type": "datetime2",
-				"scale": 0
+				"type": "nvarchar"
 			},
 			{
 				"name": "FechaHoraRegistro",
-				"type": "datetime2",
-				"scale": 0
+				"type": "nvarchar"
 			},
 			{
 				"name": "VehiculoId",

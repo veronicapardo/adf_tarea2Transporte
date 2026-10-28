@@ -79,7 +79,7 @@
 				"          HoraSalida as timestamp,",
 				"          HoraLlegada as timestamp,",
 				"          ValidacionesTarjeta as integer,",
-				"          KmRecorridos as decimal(8,1),",
+				"          KmRecorridos as decimal(10,2),",
 				"          EstadoViaje as string",
 				"     ),",
 				"     deletable:false,",

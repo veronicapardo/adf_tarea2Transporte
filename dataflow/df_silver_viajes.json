@@ -15,8 +15,26 @@
 					"name": "source1"
 				}
 			],
-			"sinks": [],
-			"transformations": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "dw_silver_viajes_sql",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "derivedColumn3"
+				}
+			],
 			"scriptLines": [
 				"source(output(",
 				"          AnioFuente as string,",
@@ -34,7 +52,50 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
-				"     format: 'table') ~> source1"
+				"     format: 'table') ~> source1",
+				"source1 derive(FechaServicio = coalesce(toDate(FechaServicio, 'yyyy-MM-dd'), toDate(FechaServicio, 'dd/MM/yyyy')),",
+				"          KmRecorridos = toDecimal(replace(KmRecorridos, ',', '.'), 8, 1),",
+				"          ValidacionesTarjeta = iif(isNull(ValidacionesTarjeta), toInteger(0), toInteger(ValidacionesTarjeta))) ~> derivedColumn1",
+				"derivedColumn1 derive(HoraProgramada = toTimestamp(right(HoraProgramada, 8), 'HH:mm:ss'),",
+				"          HoraSalida = toTimestamp(right(HoraSalida, 8), 'HH:mm:ss'),",
+				"          HoraLlegada = toTimestamp(right(HoraLlegada, 8), 'HH:mm:ss')) ~> derivedColumn2",
+				"derivedColumn2 derive(RutaHistoricaId = trim(RutaHistoricaId),",
+				"          VehiculoId = trim(VehiculoId),",
+				"          EstadoViaje = trim(EstadoViaje)) ~> derivedColumn3",
+				"derivedColumn3 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          ViajeId as string,",
+				"          RutaHistoricaId as string,",
+				"          VehiculoId as string,",
+				"          FechaServicio as date,",
+				"          HoraProgramada as timestamp,",
+				"          HoraSalida as timestamp,",
+				"          HoraLlegada as timestamp,",
+				"          ValidacionesTarjeta as integer,",
+				"          KmRecorridos as decimal(8,1),",
+				"          EstadoViaje as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          ViajeId,",
+				"          RutaHistoricaId,",
+				"          VehiculoId,",
+				"          FechaServicio,",
+				"          HoraProgramada,",
+				"          HoraSalida,",
+				"          HoraLlegada,",
+				"          ValidacionesTarjeta,",
+				"          KmRecorridos,",
+				"          EstadoViaje",
+				"     )) ~> sink1"
 			]
 		}
 	}

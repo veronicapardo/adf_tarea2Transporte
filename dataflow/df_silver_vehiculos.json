@@ -30,6 +30,9 @@
 				},
 				{
 					"name": "derivedColumn1"
+				},
+				{
+					"name": "aggregate1"
 				}
 			],
 			"scriptLines": [
@@ -50,15 +53,20 @@
 				"vehiculos derive(VigenciaDesde = iif(isInteger(VigenciaDesde), addDays(toDate('1899-12-30'), toInteger(VigenciaDesde)), coalesce(toDate(VigenciaDesde, 'dd/MM/yyyy'), toDate(VigenciaDesde, 'yyyy-MM-dd'))),",
 				"          VigenciaHasta = iif(isInteger(VigenciaHasta), addDays(toDate('1899-12-30'), toInteger(VigenciaHasta)), coalesce(toDate(VigenciaHasta, 'dd/MM/yyyy'), toDate(VigenciaHasta, 'yyyy-MM-dd')))) ~> VIGENCIAS",
 				"VIGENCIAS derive(VehiculoId = iif(startsWith(VehiculoId, 'V-'), VehiculoId, concat('V-', lpad(regexReplace(VehiculoId, '[^0-9]', ''), 3, '0'))),",
-				"          AnioFuente = iif(isNull(AnioFuente), toShort(year(VigenciaDesde)), toShort(AnioFuente)),",
 				"          Placa = trim(Placa),",
 				"          TipoVehiculo = trim(TipoVehiculo),",
 				"          CapacidadEfectiva = toInteger(CapacidadEfectiva),",
 				"          Estado = trim(Estado)) ~> derivedColumn1",
-				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"derivedColumn1 aggregate(groupBy(Placa,",
+				"          VehiculoId),",
+				"     TipoVehiculo = first(TipoVehiculo),",
+				"          CapacidadEfectiva = first(CapacidadEfectiva),",
+				"          VigenciaDesde = first(VigenciaDesde),",
+				"          VigenciaHasta = first(VigenciaHasta),",
+				"          Estado = first(Estado)) ~> aggregate1",
+				"aggregate1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
-				"          AnioFuente as integer,",
 				"          VehiculoId as string,",
 				"          Placa as string,",
 				"          TipoVehiculo as string,",
@@ -74,7 +82,16 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          VehiculoId,",
+				"          Placa,",
+				"          TipoVehiculo,",
+				"          CapacidadEfectiva,",
+				"          VigenciaDesde,",
+				"          VigenciaHasta,",
+				"          Estado",
+				"     )) ~> sink1"
 			]
 		}
 	}

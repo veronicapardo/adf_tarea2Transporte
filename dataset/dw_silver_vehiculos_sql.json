@@ -12,11 +12,6 @@
 		"type": "AzureSqlTable",
 		"schema": [
 			{
-				"name": "AnioFuente",
-				"type": "smallint",
-				"precision": 5
-			},
-			{
 				"name": "VehiculoId",
 				"type": "nvarchar"
 			},

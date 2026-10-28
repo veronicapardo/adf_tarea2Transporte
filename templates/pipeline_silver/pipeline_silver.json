@@ -1,0 +1,1791 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Nombre de instancia de Data Factory"
+		},
+		"sql_dw_transporte": {
+			"type": "string"
+		},
+		"sql_erp_transporte": {
+			"type": "string"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline_silver')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "df_silver_viajes",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "df_silver_incidentes",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_silver_viajes",
+								"type": "DataFlowReference"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "df_silver_incidente_ruta",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "df_silver_incidentes",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_silver_incidente_ruta",
+								"type": "DataFlowReference"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "df_silver_demanda_paradas",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "df_silver_rutas",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_silver_demanda_paradas",
+								"type": "DataFlowReference"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "df_silver_incidentes",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "df_silver_rutas",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_silver_incidentes",
+								"type": "DataFlowReference"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "df_silver_paradas",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "df_silver_vehiculos",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_silver_paradas",
+								"type": "DataFlowReference"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "df_silver_rutas",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "df_silver_paradas",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_silver_rutas",
+								"type": "DataFlowReference"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "df_silver_vehiculos",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Script1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "df_silver_vehiculos",
+								"type": "DataFlowReference"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "Script1",
+						"type": "Script",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "[parameters('sql_dw_transporte')]",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "NonQuery",
+									"text": "delete from silver.IncidenteRuta\ndelete from silver.DemandaParadas\ndelete from silver.Viajes\ndelete from silver.Incidentes\ndelete from silver.Paradas\ndelete from silver.Rutas\ndelete from silver.Vehiculos"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/df_silver_viajes')]",
+				"[concat(variables('factoryId'), '/dataflows/df_silver_incidente_ruta')]",
+				"[concat(variables('factoryId'), '/dataflows/df_silver_demanda_paradas')]",
+				"[concat(variables('factoryId'), '/dataflows/df_silver_incidentes')]",
+				"[concat(variables('factoryId'), '/dataflows/df_silver_paradas')]",
+				"[concat(variables('factoryId'), '/dataflows/df_silver_rutas')]",
+				"[concat(variables('factoryId'), '/dataflows/df_silver_vehiculos')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_silver_viajes')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "silver"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "dw_bronze_viajes_sql",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "dw_silver_viajes_sql",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "derivedColumn2"
+						},
+						{
+							"name": "derivedColumn3"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          AnioFuente as string,",
+						"          ViajeId as string,",
+						"          RutaHistoricaId as string,",
+						"          VehiculoId as string,",
+						"          FechaServicio as string,",
+						"          HoraProgramada as string,",
+						"          HoraSalida as string,",
+						"          HoraLlegada as string,",
+						"          ValidacionesTarjeta as string,",
+						"          KmRecorridos as string,",
+						"          EstadoViaje as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> source1",
+						"source1 derive(FechaServicio = coalesce(toDate(FechaServicio, 'yyyy-MM-dd'), toDate(FechaServicio, 'dd/MM/yyyy')),",
+						"          KmRecorridos = toDecimal(replace(KmRecorridos, ',', '.'), 8, 1),",
+						"          ValidacionesTarjeta = iif(isNull(ValidacionesTarjeta), toInteger(0), toInteger(ValidacionesTarjeta))) ~> derivedColumn1",
+						"derivedColumn1 derive(HoraProgramada = toTimestamp(right(HoraProgramada, 8), 'HH:mm:ss'),",
+						"          HoraSalida = toTimestamp(right(HoraSalida, 8), 'HH:mm:ss'),",
+						"          HoraLlegada = toTimestamp(right(HoraLlegada, 8), 'HH:mm:ss')) ~> derivedColumn2",
+						"derivedColumn2 derive(RutaHistoricaId = trim(RutaHistoricaId),",
+						"          VehiculoId = trim(VehiculoId),",
+						"          EstadoViaje = trim(EstadoViaje)) ~> derivedColumn3",
+						"derivedColumn3 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          ViajeId as string,",
+						"          RutaHistoricaId as string,",
+						"          VehiculoId as string,",
+						"          FechaServicio as date,",
+						"          HoraProgramada as timestamp,",
+						"          HoraSalida as timestamp,",
+						"          HoraLlegada as timestamp,",
+						"          ValidacionesTarjeta as integer,",
+						"          KmRecorridos as decimal(8,1),",
+						"          EstadoViaje as string",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          ViajeId,",
+						"          RutaHistoricaId,",
+						"          VehiculoId,",
+						"          FechaServicio,",
+						"          HoraProgramada,",
+						"          HoraSalida,",
+						"          HoraLlegada,",
+						"          ValidacionesTarjeta,",
+						"          KmRecorridos,",
+						"          EstadoViaje",
+						"     )) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/dw_bronze_viajes_sql')]",
+				"[concat(variables('factoryId'), '/datasets/dw_silver_viajes_sql')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_silver_incidente_ruta')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "silver"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "bronze_incidente_ruta_sql",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "dw_silver_incidente_ruta_sql",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "derivedColumn1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          AnioFuente as integer,",
+						"          IncidenteId as string,",
+						"          RutaHistoricaId as string,",
+						"          EsPrincipal as boolean",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> source1",
+						"source1 derive(RutaHistoricaId = trim(RutaHistoricaId)) ~> derivedColumn1",
+						"derivedColumn1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          IncidenteId as string,",
+						"          RutaHistoricaId as string,",
+						"          EsPrincipal as boolean",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          IncidenteId,",
+						"          RutaHistoricaId,",
+						"          EsPrincipal",
+						"     )) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/bronze_incidente_ruta_sql')]",
+				"[concat(variables('factoryId'), '/datasets/dw_silver_incidente_ruta_sql')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_silver_demanda_paradas')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "silver"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "dw_bronze_demanda_paradas_sql",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "dw_silver_demanda_paradas_sql",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "derivedColumn3"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          AnioFuente as string,",
+						"          DemandaId as string,",
+						"          FechaServicio as string,",
+						"          RutaHistoricaId as string,",
+						"          ParadaHistoricaId as string,",
+						"          Franja as string,",
+						"          ValidacionesTarjeta as string,",
+						"          Descensos as string,",
+						"          DemandaNoAtendida as string,",
+						"          Metodo as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> source1",
+						"source1 derive(FechaServicio = coalesce(toDate(FechaServicio, 'dd/MM/yyyy'), toDate(FechaServicio, 'yyyy-MM-dd'))) ~> derivedColumn1",
+						"derivedColumn1 derive(RutaHistoricaId = iif(startsWith(RutaHistoricaId, 'RH-'), RutaHistoricaId, concat('RH-', lpad(regexReplace(RutaHistoricaId, '[^0-9]', ''), 2, '0'))),",
+						"          DemandaId = iif(isNull(DemandaId), concat('DM-', '-', toString(FechaServicio, 'yyyyMMdd'), '-', RutaHistoricaId, '-', ParadaHistoricaId, '-', regexReplace(Franja, '[^0-9]', '')), DemandaId),",
+						"          ValidacionesTarjeta = toInteger(ValidacionesTarjeta),",
+						"          Descensos = toInteger(Descensos),",
+						"          DemandaNoAtendida = toInteger(DemandaNoAtendida)) ~> derivedColumn3",
+						"derivedColumn3 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          DemandaId as string,",
+						"          FechaServicio as date,",
+						"          RutaHistoricaId as string,",
+						"          ParadaHistoricaId as string,",
+						"          Franja as string,",
+						"          ValidacionesTarjeta as integer,",
+						"          Descensos as integer,",
+						"          DemandaNoAtendida as integer,",
+						"          Metodo as string",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          DemandaId,",
+						"          FechaServicio,",
+						"          RutaHistoricaId,",
+						"          ParadaHistoricaId,",
+						"          Franja,",
+						"          ValidacionesTarjeta,",
+						"          Descensos,",
+						"          DemandaNoAtendida,",
+						"          Metodo",
+						"     )) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/dw_bronze_demanda_paradas_sql')]",
+				"[concat(variables('factoryId'), '/datasets/dw_silver_demanda_paradas_sql')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_silver_incidentes')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "silver"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "dw_bronze_incidentes_sql",
+								"type": "DatasetReference"
+							},
+							"name": "incidentes"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "dw_silver_incidentes_sql",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "fechas"
+						},
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "derivedColumn2"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          AnioFuente as string,",
+						"          IncidenteId as string,",
+						"          TipoIncidente as string,",
+						"          Severidad as string,",
+						"          FechaHoraInicio as string,",
+						"          FechaHoraFin as string,",
+						"          FechaHoraRegistro as string,",
+						"          VehiculoId as string,",
+						"          Descripcion as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> incidentes",
+						"incidentes derive(FechaHoraInicio = coalesce(toTimestamp(FechaHoraInicio, 'yyyy-MM-dd HH:mm:ss'), toTimestamp(FechaHoraInicio, 'dd/MM/yyyy HH:mm')),",
+						"          FechaHoraFin = coalesce(toTimestamp(FechaHoraFin, 'yyyy-MM-dd HH:mm:ss'), toTimestamp(FechaHoraFin, 'dd/MM/yyyy HH:mm')),",
+						"          FechaHoraRegistro = coalesce(toTimestamp(FechaHoraRegistro, 'yyyy-MM-dd HH:mm:ss'), toTimestamp(FechaHoraRegistro, 'dd/MM/yyyy HH:mm'))) ~> fechas",
+						"fechas derive(IncidenteId = trim(IncidenteId),",
+						"          TipoIncidente = trim(TipoIncidente),",
+						"          Severidad = trim(Severidad),",
+						"          VehiculoId = iif(isNull(VehiculoId), toString(null()), trim(VehiculoId)),",
+						"          Descripcion = trim(Descripcion)) ~> derivedColumn1",
+						"derivedColumn1 derive(IncidenteId = iif(isNull(FechaHoraRegistro), toString(FechaHoraInicio), toString(FechaHoraRegistro))) ~> derivedColumn2",
+						"derivedColumn2 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          IncidenteId as string,",
+						"          TipoIncidente as string,",
+						"          Severidad as string,",
+						"          FechaHoraInicio as timestamp,",
+						"          FechaHoraFin as timestamp,",
+						"          FechaHoraRegistro as timestamp,",
+						"          VehiculoId as string,",
+						"          Descripcion as string",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          TipoIncidente,",
+						"          Severidad,",
+						"          FechaHoraInicio,",
+						"          FechaHoraFin,",
+						"          FechaHoraRegistro,",
+						"          VehiculoId,",
+						"          Descripcion",
+						"     )) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/dw_bronze_incidentes_sql')]",
+				"[concat(variables('factoryId'), '/datasets/dw_silver_incidentes_sql')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_silver_paradas')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "silver"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "dw_bronze_paradas_sql",
+								"type": "DatasetReference"
+							},
+							"name": "paradas"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "dw_silver_paradas_sql",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "derivedColumn2"
+						},
+						{
+							"name": "derivedColumn3"
+						},
+						{
+							"name": "aggregate1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          AnioFuente as string,",
+						"          ParadaHistoricaId as string,",
+						"          CodigoPublicado as string,",
+						"          NombreParada as string,",
+						"          Zona as string,",
+						"          Latitud as string,",
+						"          Longitud as string,",
+						"          VigenciaDesde as string,",
+						"          VigenciaHasta as string,",
+						"          Estado as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> paradas",
+						"paradas derive(VigenciaDesde = iif(isInteger(VigenciaDesde), addDays(toDate('1899-12-30'), toInteger(VigenciaDesde)), coalesce(toDate(VigenciaDesde, 'yyyy-MM-dd'), toDate(VigenciaDesde, 'dd/MM/yyyy'))),",
+						"          VigenciaHasta = iif(isInteger(VigenciaHasta), addDays(toDate('1899-12-30'), toInteger(VigenciaHasta)), coalesce(toDate(VigenciaHasta, 'yyyy-MM-dd'), toDate(VigenciaHasta, 'dd/MM/yyyy')))) ~> derivedColumn1",
+						"derivedColumn1 derive(ParadaHistoricaId = trim(ParadaHistoricaId),",
+						"          CodigoPublicado = iif(isNull(CodigoPublicado), trim(ParadaHistoricaId), trim(CodigoPublicado)),",
+						"          NombreParada = trim(NombreParada),",
+						"          Zona = trim(Zona),",
+						"          Estado = trim(Estado)) ~> derivedColumn2",
+						"derivedColumn2 derive(Latitud = toDecimal(Latitud, 9, 6),",
+						"          Longitud = toDecimal(Longitud, 9, 6)) ~> derivedColumn3",
+						"derivedColumn3 aggregate(groupBy(ParadaHistoricaId,",
+						"          VigenciaDesde),",
+						"     CodigoPublicado = first(CodigoPublicado),",
+						"          NombreParada = first(NombreParada),",
+						"          Zona = first(Zona),",
+						"          Latitud = first(Latitud),",
+						"          Longitud = first(Longitud),",
+						"          VigenciaHasta = first(VigenciaHasta),",
+						"          Estado = first(Estado)) ~> aggregate1",
+						"aggregate1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          ParadaHistoricaId as string,",
+						"          CodigoPublicado as string,",
+						"          NombreParada as string,",
+						"          Zona as string,",
+						"          Latitud as decimal(9,6),",
+						"          Longitud as decimal(9,6),",
+						"          VigenciaDesde as date,",
+						"          VigenciaHasta as date,",
+						"          Estado as string",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          ParadaHistoricaId,",
+						"          CodigoPublicado,",
+						"          NombreParada,",
+						"          Zona,",
+						"          Latitud,",
+						"          Longitud,",
+						"          VigenciaDesde,",
+						"          VigenciaHasta,",
+						"          Estado",
+						"     )) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/dw_bronze_paradas_sql')]",
+				"[concat(variables('factoryId'), '/datasets/dw_silver_paradas_sql')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_silver_rutas')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "silver"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "dw_bronze_rutas_sql",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "dw_silver_rutas_sql",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "aggregate1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          AnioFuente as string,",
+						"          RutaHistoricaId as string,",
+						"          CodigoRuta as string,",
+						"          NombreRuta as string,",
+						"          Origen as string,",
+						"          Destino as string,",
+						"          VigenciaDesde as string,",
+						"          VigenciaHasta as string,",
+						"          Estado as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> source1",
+						"source1 derive(RutaHistoricaId = iif(startsWith(RutaHistoricaId, 'RH-'), RutaHistoricaId, concat('RH-', lpad(regexReplace(RutaHistoricaId, '[^0-9]', ''), 2, '0'))),",
+						"          CodigoRuta = iifNull(CodigoRuta, concat('R-', lpad(regexReplace(RutaHistoricaId, '[^0-9]', ''), 2, '0'))),",
+						"          VigenciaDesde = coalesce(toDate(VigenciaDesde, 'yyyy-MM-dd'), toDate(VigenciaDesde, 'dd/MM/yyyy')),",
+						"          VigenciaHasta = coalesce(toDate(VigenciaHasta, 'yyyy-MM-dd'), toDate(VigenciaHasta, 'dd/MM/yyyy')),",
+						"          NombreRuta = trim(NombreRuta),",
+						"          Origen = trim(Origen),",
+						"          Destino = trim(Destino),",
+						"          Estado = trim(Estado)) ~> derivedColumn1",
+						"derivedColumn1 aggregate(groupBy(RutaHistoricaId),",
+						"     CodigoRuta = first(CodigoRuta),",
+						"          NombreRuta = first(NombreRuta),",
+						"          Origen = first(Origen),",
+						"          Destino = first(Destino),",
+						"          VigenciaDesde = first(VigenciaDesde),",
+						"          VigenciaHasta = first(VigenciaHasta),",
+						"          Estado = first(Estado)) ~> aggregate1",
+						"aggregate1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          RutaHistoricaId as string,",
+						"          CodigoRuta as string,",
+						"          NombreRuta as string,",
+						"          Origen as string,",
+						"          Destino as string,",
+						"          VigenciaDesde as date,",
+						"          VigenciaHasta as date,",
+						"          Estado as string",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          RutaHistoricaId,",
+						"          CodigoRuta,",
+						"          NombreRuta,",
+						"          Origen,",
+						"          Destino,",
+						"          VigenciaDesde,",
+						"          VigenciaHasta,",
+						"          Estado",
+						"     )) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/dw_bronze_rutas_sql')]",
+				"[concat(variables('factoryId'), '/datasets/dw_silver_rutas_sql')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_silver_vehiculos')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "silver"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "dw_bronze_vehiculos_sql",
+								"type": "DatasetReference"
+							},
+							"name": "vehiculos"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "dw_silver_vehiculos_sql",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "VIGENCIAS"
+						},
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "aggregate1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          AnioFuente as string,",
+						"          VehiculoId as string,",
+						"          Placa as string,",
+						"          TipoVehiculo as string,",
+						"          CapacidadEfectiva as string,",
+						"          VigenciaDesde as string,",
+						"          VigenciaHasta as string,",
+						"          Estado as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> vehiculos",
+						"vehiculos derive(VigenciaDesde = iif(isInteger(VigenciaDesde), addDays(toDate('1899-12-30'), toInteger(VigenciaDesde)), coalesce(toDate(VigenciaDesde, 'dd/MM/yyyy'), toDate(VigenciaDesde, 'yyyy-MM-dd'))),",
+						"          VigenciaHasta = iif(isInteger(VigenciaHasta), addDays(toDate('1899-12-30'), toInteger(VigenciaHasta)), coalesce(toDate(VigenciaHasta, 'dd/MM/yyyy'), toDate(VigenciaHasta, 'yyyy-MM-dd')))) ~> VIGENCIAS",
+						"VIGENCIAS derive(VehiculoId = iif(startsWith(VehiculoId, 'V-'), VehiculoId, concat('V-', lpad(regexReplace(VehiculoId, '[^0-9]', ''), 3, '0'))),",
+						"          Placa = trim(Placa),",
+						"          TipoVehiculo = trim(TipoVehiculo),",
+						"          CapacidadEfectiva = toInteger(CapacidadEfectiva),",
+						"          Estado = trim(Estado)) ~> derivedColumn1",
+						"derivedColumn1 aggregate(groupBy(Placa,",
+						"          VehiculoId),",
+						"     TipoVehiculo = first(TipoVehiculo),",
+						"          CapacidadEfectiva = first(CapacidadEfectiva),",
+						"          VigenciaDesde = first(VigenciaDesde),",
+						"          VigenciaHasta = first(VigenciaHasta),",
+						"          Estado = first(Estado)) ~> aggregate1",
+						"aggregate1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          VehiculoId as string,",
+						"          Placa as string,",
+						"          TipoVehiculo as string,",
+						"          CapacidadEfectiva as integer,",
+						"          VigenciaDesde as date,",
+						"          VigenciaHasta as date,",
+						"          Estado as string",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          VehiculoId,",
+						"          Placa,",
+						"          TipoVehiculo,",
+						"          CapacidadEfectiva,",
+						"          VigenciaDesde,",
+						"          VigenciaHasta,",
+						"          Estado",
+						"     )) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/dw_bronze_vehiculos_sql')]",
+				"[concat(variables('factoryId'), '/datasets/dw_silver_vehiculos_sql')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dw_bronze_viajes_sql')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('sql_dw_transporte')]",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "bronze/sql"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "AnioFuente",
+						"type": "varchar"
+					},
+					{
+						"name": "ViajeId",
+						"type": "varchar"
+					},
+					{
+						"name": "RutaHistoricaId",
+						"type": "varchar"
+					},
+					{
+						"name": "VehiculoId",
+						"type": "varchar"
+					},
+					{
+						"name": "FechaServicio",
+						"type": "varchar"
+					},
+					{
+						"name": "HoraProgramada",
+						"type": "varchar"
+					},
+					{
+						"name": "HoraSalida",
+						"type": "varchar"
+					},
+					{
+						"name": "HoraLlegada",
+						"type": "varchar"
+					},
+					{
+						"name": "ValidacionesTarjeta",
+						"type": "varchar"
+					},
+					{
+						"name": "KmRecorridos",
+						"type": "varchar"
+					},
+					{
+						"name": "EstadoViaje",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "bronze",
+					"table": "Viajes"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dw_silver_viajes_sql')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('sql_dw_transporte')]",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "silver"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ViajeId",
+						"type": "nvarchar"
+					},
+					{
+						"name": "RutaHistoricaId",
+						"type": "nvarchar"
+					},
+					{
+						"name": "VehiculoId",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FechaServicio",
+						"type": "date"
+					},
+					{
+						"name": "HoraProgramada",
+						"type": "time",
+						"scale": 7
+					},
+					{
+						"name": "HoraSalida",
+						"type": "time",
+						"scale": 7
+					},
+					{
+						"name": "HoraLlegada",
+						"type": "time",
+						"scale": 7
+					},
+					{
+						"name": "ValidacionesTarjeta",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "KmRecorridos",
+						"type": "decimal",
+						"precision": 8,
+						"scale": 1
+					},
+					{
+						"name": "EstadoViaje",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "silver",
+					"table": "Viajes"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/bronze_incidente_ruta_sql')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('sql_erp_transporte')]",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "bronze/sql"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "AnioFuente",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "IncidenteId",
+						"type": "nvarchar"
+					},
+					{
+						"name": "RutaHistoricaId",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EsPrincipal",
+						"type": "bit"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "IncidenteRutaAzure"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dw_silver_incidente_ruta_sql')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('sql_dw_transporte')]",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "silver"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "IncidenteId",
+						"type": "nvarchar"
+					},
+					{
+						"name": "RutaHistoricaId",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EsPrincipal",
+						"type": "bit"
+					}
+				],
+				"typeProperties": {
+					"schema": "silver",
+					"table": "IncidenteRuta"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dw_bronze_demanda_paradas_sql')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('sql_dw_transporte')]",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "bronze/sql"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "AnioFuente",
+						"type": "varchar"
+					},
+					{
+						"name": "DemandaId",
+						"type": "varchar"
+					},
+					{
+						"name": "FechaServicio",
+						"type": "varchar"
+					},
+					{
+						"name": "RutaHistoricaId",
+						"type": "varchar"
+					},
+					{
+						"name": "ParadaHistoricaId",
+						"type": "varchar"
+					},
+					{
+						"name": "Franja",
+						"type": "varchar"
+					},
+					{
+						"name": "ValidacionesTarjeta",
+						"type": "varchar"
+					},
+					{
+						"name": "Descensos",
+						"type": "varchar"
+					},
+					{
+						"name": "DemandaNoAtendida",
+						"type": "varchar"
+					},
+					{
+						"name": "Metodo",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "bronze",
+					"table": "DemandaParadas"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dw_silver_demanda_paradas_sql')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('sql_dw_transporte')]",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "silver"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "DemandaId",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FechaServicio",
+						"type": "date"
+					},
+					{
+						"name": "RutaHistoricaId",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ParadaHistoricaId",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Franja",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ValidacionesTarjeta",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Descensos",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DemandaNoAtendida",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Metodo",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "silver",
+					"table": "DemandaParadas"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dw_bronze_incidentes_sql')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('sql_dw_transporte')]",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "bronze/sql"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "AnioFuente",
+						"type": "varchar"
+					},
+					{
+						"name": "IncidenteId",
+						"type": "varchar"
+					},
+					{
+						"name": "TipoIncidente",
+						"type": "varchar"
+					},
+					{
+						"name": "Severidad",
+						"type": "varchar"
+					},
+					{
+						"name": "FechaHoraInicio",
+						"type": "varchar"
+					},
+					{
+						"name": "FechaHoraFin",
+						"type": "varchar"
+					},
+					{
+						"name": "FechaHoraRegistro",
+						"type": "varchar"
+					},
+					{
+						"name": "VehiculoId",
+						"type": "varchar"
+					},
+					{
+						"name": "Descripcion",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "bronze",
+					"table": "Incidentes"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dw_silver_incidentes_sql')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('sql_dw_transporte')]",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "silver"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "IncidenteId",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TipoIncidente",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Severidad",
+						"type": "nvarchar"
+					},
+					{
+						"name": "FechaHoraInicio",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "FechaHoraFin",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "FechaHoraRegistro",
+						"type": "datetime2",
+						"scale": 0
+					},
+					{
+						"name": "VehiculoId",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Descripcion",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "silver",
+					"table": "Incidentes"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dw_bronze_paradas_sql')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('sql_dw_transporte')]",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "bronze/sql"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "AnioFuente",
+						"type": "varchar"
+					},
+					{
+						"name": "ParadaHistoricaId",
+						"type": "varchar"
+					},
+					{
+						"name": "CodigoPublicado",
+						"type": "varchar"
+					},
+					{
+						"name": "NombreParada",
+						"type": "varchar"
+					},
+					{
+						"name": "Zona",
+						"type": "varchar"
+					},
+					{
+						"name": "Latitud",
+						"type": "varchar"
+					},
+					{
+						"name": "Longitud",
+						"type": "varchar"
+					},
+					{
+						"name": "VigenciaDesde",
+						"type": "varchar"
+					},
+					{
+						"name": "VigenciaHasta",
+						"type": "varchar"
+					},
+					{
+						"name": "Estado",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "bronze",
+					"table": "Paradas"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dw_silver_paradas_sql')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('sql_dw_transporte')]",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "silver"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ParadaHistoricaId",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CodigoPublicado",
+						"type": "nvarchar"
+					},
+					{
+						"name": "NombreParada",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Zona",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Latitud",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 6
+					},
+					{
+						"name": "Longitud",
+						"type": "decimal",
+						"precision": 9,
+						"scale": 6
+					},
+					{
+						"name": "VigenciaDesde",
+						"type": "date"
+					},
+					{
+						"name": "VigenciaHasta",
+						"type": "date"
+					},
+					{
+						"name": "Estado",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "silver",
+					"table": "Paradas"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dw_bronze_rutas_sql')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('sql_dw_transporte')]",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "bronze/sql"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "AnioFuente",
+						"type": "varchar"
+					},
+					{
+						"name": "RutaHistoricaId",
+						"type": "varchar"
+					},
+					{
+						"name": "CodigoRuta",
+						"type": "varchar"
+					},
+					{
+						"name": "NombreRuta",
+						"type": "varchar"
+					},
+					{
+						"name": "Origen",
+						"type": "varchar"
+					},
+					{
+						"name": "Destino",
+						"type": "varchar"
+					},
+					{
+						"name": "VigenciaDesde",
+						"type": "varchar"
+					},
+					{
+						"name": "VigenciaHasta",
+						"type": "varchar"
+					},
+					{
+						"name": "Estado",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "bronze",
+					"table": "Rutas"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dw_silver_rutas_sql')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('sql_dw_transporte')]",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "silver"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "RutaHistoricaId",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CodigoRuta",
+						"type": "nvarchar"
+					},
+					{
+						"name": "NombreRuta",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Origen",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Destino",
+						"type": "nvarchar"
+					},
+					{
+						"name": "VigenciaDesde",
+						"type": "date"
+					},
+					{
+						"name": "VigenciaHasta",
+						"type": "date"
+					},
+					{
+						"name": "Estado",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "silver",
+					"table": "Rutas"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dw_bronze_vehiculos_sql')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('sql_dw_transporte')]",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "bronze/sql"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "AnioFuente",
+						"type": "varchar"
+					},
+					{
+						"name": "VehiculoId",
+						"type": "varchar"
+					},
+					{
+						"name": "Placa",
+						"type": "varchar"
+					},
+					{
+						"name": "TipoVehiculo",
+						"type": "varchar"
+					},
+					{
+						"name": "CapacidadEfectiva",
+						"type": "varchar"
+					},
+					{
+						"name": "VigenciaDesde",
+						"type": "varchar"
+					},
+					{
+						"name": "VigenciaHasta",
+						"type": "varchar"
+					},
+					{
+						"name": "Estado",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "bronze",
+					"table": "Vehiculos"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dw_silver_vehiculos_sql')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('sql_dw_transporte')]",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "silver"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "VehiculoId",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Placa",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TipoVehiculo",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CapacidadEfectiva",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "VigenciaDesde",
+						"type": "date"
+					},
+					{
+						"name": "VigenciaHasta",
+						"type": "date"
+					},
+					{
+						"name": "Estado",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "silver",
+					"table": "Vehiculos"
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}

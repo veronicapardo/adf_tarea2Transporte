@@ -15,7 +15,15 @@
 					"name": "vehiculos"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "dw_silver_vehiculos_sql",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "VIGENCIAS"
@@ -43,7 +51,30 @@
 				"          VigenciaHasta = iif(isInteger(VigenciaHasta), addDays(toDate('1899-12-30'), toInteger(VigenciaHasta)), coalesce(toDate(VigenciaHasta, 'dd/MM/yyyy'), toDate(VigenciaHasta, 'yyyy-MM-dd')))) ~> VIGENCIAS",
 				"VIGENCIAS derive(VehiculoId = iif(startsWith(VehiculoId, 'V-'), VehiculoId, concat('V-', lpad(regexReplace(VehiculoId, '[^0-9]', ''), 3, '0'))),",
 				"          AnioFuente = iif(isNull(AnioFuente), toShort(year(VigenciaDesde)), toShort(AnioFuente)),",
-				"          Placa = trim(Placa)) ~> derivedColumn1"
+				"          Placa = trim(Placa),",
+				"          TipoVehiculo = trim(TipoVehiculo),",
+				"          CapacidadEfectiva = toInteger(CapacidadEfectiva),",
+				"          Estado = trim(Estado)) ~> derivedColumn1",
+				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          AnioFuente as integer,",
+				"          VehiculoId as string,",
+				"          Placa as string,",
+				"          TipoVehiculo as string,",
+				"          CapacidadEfectiva as integer,",
+				"          VigenciaDesde as date,",
+				"          VigenciaHasta as date,",
+				"          Estado as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
 			]
 		}
 	}

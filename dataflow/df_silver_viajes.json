@@ -65,7 +65,7 @@
 				"derivedColumn4 derive(RutaHistoricaId = trim(RutaHistoricaId),",
 				"          VehiculoId = trim(VehiculoId),",
 				"          EstadoViaje = trim(EstadoViaje)) ~> derivedColumn3",
-				"derivedColumn2 derive(HoraProgramada = iif(isNull(HoraProgramada) || length(trim(toString(HoraProgramada))) == 0, '00:00:00', trim(toString(HoraProgramada))),",
+				"derivedColumn2 derive(HoraProgramada = iif(isNull(HoraProgramada), toTimestamp('00:00:00', 'HH:mm:ss'), HoraProgramada),",
 				"          HoraSalida = iif(isNull(HoraSalida) || length(trim(toString(HoraSalida))) == 0, '00:00:00', trim(toString(HoraSalida))),",
 				"          HoraLlegada = iif(isNull(HoraLlegada) || length(trim(toString(HoraLlegada))) == 0, '00:00:00', trim(toString(HoraLlegada)))) ~> derivedColumn4",
 				"derivedColumn3 sink(allowSchemaDrift: true,",

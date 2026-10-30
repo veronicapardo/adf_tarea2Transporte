@@ -85,7 +85,7 @@
 				"     skipDuplicateMapOutputs: true,",
 				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
-				"          IncidenteId = FechaHoraRegistro,",
+				"          IncidenteId,",
 				"          TipoIncidente,",
 				"          Severidad,",
 				"          FechaHoraInicio,",

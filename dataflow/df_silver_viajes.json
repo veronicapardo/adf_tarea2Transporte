@@ -67,7 +67,7 @@
 				"          EstadoViaje = trim(EstadoViaje)) ~> derivedColumn3",
 				"derivedColumn2 derive(HoraProgramada = iif(isNull(HoraProgramada), toTimestamp('00:00:00', 'HH:mm:ss'), HoraProgramada),",
 				"          HoraSalida = iif(isNull(HoraSalida), toTimestamp('00:00:00', 'HH:mm:ss'), HoraSalida),",
-				"          HoraLlegada = ERROR_FUNCTION('iif(isNull(HoraLlegada)), toTimestamp(__SINGLE_QUOTE__00:00:00__SINGLE_QUOTE__, __SINGLE_QUOTE__HH:mm:ss__SINGLE_QUOTE__), HoraLlegada)')) ~> derivedColumn4",
+				"          HoraLlegada = iif(isNull(HoraLlegada), toTimestamp('00:00:00', 'HH:mm:ss'), HoraLlegada)) ~> derivedColumn4",
 				"derivedColumn3 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -98,7 +98,7 @@
 				"          HoraProgramada,",
 				"          HoraSalida,",
 				"          HoraLlegada,",
-				"          ValidacionesTarjeta = HoraLlegada,",
+				"          ValidacionesTarjeta,",
 				"          KmRecorridos,",
 				"          EstadoViaje",
 				"     )) ~> sink1"

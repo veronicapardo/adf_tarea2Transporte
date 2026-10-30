@@ -62,7 +62,7 @@
 				"derivedColumn1 derive(HoraProgramada = toTimestamp(right(HoraProgramada, 8), 'HH:mm:ss'),",
 				"          HoraSalida = toTimestamp(right(HoraSalida, 8), 'HH:mm:ss'),",
 				"          HoraLlegada = toTimestamp(right(HoraLlegada, 8), 'HH:mm:ss')) ~> derivedColumn2",
-				"derivedColumn4 derive(RutaHistoricaId = trim(RutaHistoricaId),",
+				"derivedColumn4 derive(RutaHistoricaId = iif(isNull(RutaHistoricaId) || length(trim(toString(RutaHistoricaId))) == 0, 'SIN DATO', trim(toString(RutaHistoricaId))),",
 				"          VehiculoId = trim(VehiculoId),",
 				"          EstadoViaje = trim(EstadoViaje)) ~> derivedColumn3",
 				"derivedColumn2 derive(HoraProgramada = iif(isNull(HoraProgramada), toTimestamp('00:00:00', 'HH:mm:ss'), HoraProgramada),",
